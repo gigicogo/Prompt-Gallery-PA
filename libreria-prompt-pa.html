@@ -1,0 +1,1246 @@
+<!DOCTYPE html>
+<html lang="it">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1, viewport-fit=cover">
+<title>Libreria dei prompt</title>
+<style>
+  :root {
+    --bg: #F3F6FA;
+    --surface: #FFFFFF;
+    --ink: #14243B;
+    --muted: #566579;
+    --line: #D3DBE6;
+    --line-strong: #8796AB;
+    --accent: #1F4E9C;
+    --accent-ink: #FFFFFF;
+    --accent-soft: #E4ECF8;
+    --focus: #1F4E9C;
+    --ok: #17694F;
+    --ok-soft: #DFF1EA;
+    --warn: #7A4F00;
+    --warn-soft: #FBEFD2;
+    --bad: #A32727;
+    --bad-soft: #FBE4E4;
+    --neutral-soft: #E8ECF2;
+    color-scheme: light;
+  }
+  @media (prefers-color-scheme: dark) {
+    :root:not([data-theme="light"]) {
+      --bg: #0F1724;
+      --surface: #172134;
+      --ink: #E7EDF6;
+      --muted: #A3B1C4;
+      --line: #2C3A52;
+      --line-strong: #5C6E8C;
+      --accent: #7FB0FF;
+      --accent-ink: #0B1426;
+      --accent-soft: #1E3050;
+      --focus: #9CC2FF;
+      --ok: #6FD3A8;
+      --ok-soft: #173A2E;
+      --warn: #F0C46A;
+      --warn-soft: #3A2E12;
+      --bad: #FF9A9A;
+      --bad-soft: #3F1D1D;
+      --neutral-soft: #243148;
+      color-scheme: dark;
+    }
+  }
+  :root[data-theme="dark"] {
+    --bg: #0F1724;
+    --surface: #172134;
+    --ink: #E7EDF6;
+    --muted: #A3B1C4;
+    --line: #2C3A52;
+    --line-strong: #5C6E8C;
+    --accent: #7FB0FF;
+    --accent-ink: #0B1426;
+    --accent-soft: #1E3050;
+    --focus: #9CC2FF;
+    --ok: #6FD3A8;
+    --ok-soft: #173A2E;
+    --warn: #F0C46A;
+    --warn-soft: #3A2E12;
+    --bad: #FF9A9A;
+    --bad-soft: #3F1D1D;
+    --neutral-soft: #243148;
+    color-scheme: dark;
+  }
+
+  :root { box-sizing: border-box; padding-top: env(safe-area-inset-top, 0px); padding-bottom: env(safe-area-inset-bottom, 0px); }
+  html { scroll-padding-top: env(safe-area-inset-top, 0px); }
+  *, *::before, *::after { box-sizing: inherit; }
+
+  body {
+    margin: 0;
+    background: var(--bg);
+    color: var(--ink);
+    font: 400 1rem/1.55 'Public Sans', system-ui, -apple-system, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+    -webkit-text-size-adjust: 100%;
+  }
+
+  .wrap { max-width: 1200px; margin: 0 auto; padding: 1.5rem clamp(1rem, 3vw, 2rem) 4rem; }
+
+  .top { display: flex; justify-content: space-between; align-items: flex-end; gap: 1rem; flex-wrap: wrap; margin-bottom: 1.5rem; }
+  h1 { font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight: 700; font-size: clamp(1.8rem, 3.2vw, 2.4rem); line-height: 1.15; letter-spacing: -0.01em; margin: 0 0 0.4rem; }
+  .lead { margin: 0; color: var(--muted); max-width: 62ch; }
+
+  .layout { display: grid; gap: 1.5rem; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 980px) {
+    .layout { grid-template-columns: minmax(0, 1fr) 380px; align-items: start; }
+    .side { position: sticky; top: 1rem; max-height: calc(100vh - 2rem); overflow: auto; }
+  }
+
+  .sheet, .panel { background: var(--surface); border: 1px solid var(--line); border-radius: 14px; }
+  .sheet { padding: clamp(1.1rem, 2.5vw, 2rem); }
+  .panel { padding: 1.25rem; }
+
+  h2 { font-family: 'Source Serif 4', Georgia, 'Times New Roman', serif; font-weight: 600; font-size: 1.3rem; line-height: 1.25; margin: 0 0 0.25rem; }
+  h3 { font-size: 1rem; font-weight: 700; margin: 0 0 0.4rem; }
+  .sec-note { margin: 0 0 1.1rem; color: var(--muted); font-size: 0.9rem; }
+  .sec + .sec { border-top: 1px solid var(--line); margin-top: 1.9rem; padding-top: 1.75rem; }
+  .legend-req { margin: 0 0 1.25rem; font-size: 0.85rem; color: var(--muted); }
+
+  .grid { display: grid; gap: 1.1rem 1.25rem; grid-template-columns: minmax(0, 1fr); }
+  @media (min-width: 640px) { .grid.two { grid-template-columns: repeat(2, minmax(0, 1fr)); } }
+  .grid > .full { grid-column: 1 / -1; }
+
+  label, .label { display: block; font-weight: 600; font-size: 0.9375rem; margin-bottom: 0.35rem; }
+  .req { color: var(--bad); margin-left: 0.15rem; }
+  input[type="text"], input[type="search"], input[type="date"], select, textarea {
+    width: 100%; font: inherit; color: var(--ink); background: var(--surface);
+    border: 1px solid var(--line-strong); border-radius: 8px; padding: 0.6rem 0.75rem; min-height: 2.75rem;
+  }
+  textarea { resize: vertical; line-height: 1.5; }
+  textarea.tall { line-height: 1.6; }
+  input[readonly] { background: var(--bg); color: var(--muted); }
+  input::placeholder, textarea::placeholder { color: var(--muted); opacity: 0.8; }
+  :focus-visible { outline: 3px solid var(--focus); outline-offset: 2px; }
+  [aria-invalid="true"] { border-color: var(--bad); }
+  .hint { font-size: 0.85rem; color: var(--muted); margin: 0.3rem 0 0; }
+  .error { font-size: 0.875rem; color: var(--bad); margin: 0.3rem 0 0; font-weight: 500; }
+  .error:empty { display: none; }
+
+  /* Il codice: scomposizione in tempo reale */
+  .anatomy { display: grid; grid-template-columns: repeat(2, minmax(0, 1fr)); gap: 0.5rem; margin-top: 0.7rem; }
+  @media (min-width: 640px) { .anatomy { grid-template-columns: repeat(4, minmax(0, 1fr)); } }
+  .part { border: 1.5px dashed var(--line-strong); border-radius: 10px; padding: 0.55rem 0.7rem; transition: background-color 0.15s, border-color 0.15s; min-width: 0; }
+  .part .v { display: block; font-weight: 700; font-size: 1.05rem; line-height: 1.3; font-variant-numeric: tabular-nums; color: var(--muted); overflow-wrap: anywhere; }
+  .part .k { display: block; font-size: 0.8rem; line-height: 1.3; color: var(--muted); margin-top: 0.1rem; }
+  .part.typing { border: 1.5px solid var(--line-strong); }
+  .part.typing .v { color: var(--ink); }
+  .part.ok { border: 1.5px solid var(--accent); background: var(--accent-soft); }
+  .part.ok .v { color: var(--ink); }
+  .part.ok .v::after { content: " \2713"; color: var(--ok); }
+  .part.bad { border: 1.5px solid var(--bad); background: var(--bad-soft); }
+  .part.bad .v { color: var(--bad); }
+  .sr { position: absolute; width: 1px; height: 1px; overflow: hidden; clip: rect(0 0 0 0); white-space: nowrap; }
+
+  /* Opzioni a scelta singola */
+  .seg { display: flex; flex-wrap: wrap; gap: 0.5rem; }
+  .seg-opt { position: relative; margin: 0; font-weight: 500; }
+  .seg-opt input { position: absolute; opacity: 0; inset: 0; width: 100%; height: 100%; margin: 0; cursor: pointer; }
+  .seg-opt span { display: inline-flex; align-items: center; gap: 0.5rem; min-height: 2.75rem; padding: 0.5rem 1rem; border: 1px solid var(--line-strong); border-radius: 8px; background: var(--surface); }
+  .seg-opt input:checked + span { border-color: var(--accent); background: var(--accent-soft); font-weight: 700; box-shadow: inset 0 0 0 1px var(--accent); }
+  .seg-opt input:focus-visible + span { outline: 3px solid var(--focus); outline-offset: 2px; }
+  .seg-opt[data-level] span::before { content: ""; width: 0.65rem; height: 0.65rem; border-radius: 50%; background: var(--dot); }
+  .seg-opt[data-level="Ordinario"] { --dot: var(--ok); }
+  .seg-opt[data-level="Attenzione moderata"] { --dot: #D69E1F; }
+  .seg-opt[data-level="Attenzione elevata"] { --dot: var(--bad); }
+  .seg.small .seg-opt span { min-height: 2.25rem; padding: 0.3rem 0.85rem; font-size: 0.9rem; }
+
+  .chips { display: flex; flex-wrap: wrap; gap: 0.35rem; margin-top: 0.5rem; align-items: center; }
+  .chips:empty { display: none; }
+  .chip { background: var(--accent-soft); color: var(--ink); border-radius: 6px; padding: 0.1rem 0.5rem; font-size: 0.85rem; font-weight: 600; }
+  .chips .lbl { font-size: 0.85rem; color: var(--muted); margin-right: 0.15rem; }
+
+  .banner { background: var(--warn-soft); color: var(--ink); border: 1px solid var(--warn); border-radius: 10px; padding: 0.7rem 0.9rem; margin-bottom: 1.25rem; font-size: 0.925rem; }
+
+  .actions { display: flex; flex-wrap: wrap; gap: 0.75rem; margin-top: 2rem; padding-top: 1.5rem; border-top: 1px solid var(--line); }
+
+  .btn { font: inherit; font-weight: 600; border-radius: 8px; border: 1px solid var(--line-strong); background: var(--surface); color: var(--ink); padding: 0.6rem 1.1rem; min-height: 2.75rem; cursor: pointer; }
+  .btn:hover:not(:disabled) { background: var(--accent-soft); }
+  .btn.primary { background: var(--accent); border-color: var(--accent); color: var(--accent-ink); }
+  .btn.primary:hover:not(:disabled) { background: var(--accent); filter: brightness(1.1); }
+  .btn.danger { border-color: var(--bad); color: var(--bad); }
+  .btn.small { min-height: 2.25rem; padding: 0.3rem 0.75rem; font-size: 0.875rem; }
+  .btn.link { border: 0; background: none; color: var(--accent); padding: 0.2rem 0.3rem; min-height: 0; text-decoration: underline; font-weight: 600; }
+  .btn:disabled { opacity: 0.5; cursor: not-allowed; }
+  .btn-row { display: flex; flex-wrap: wrap; gap: 0.5rem; margin: 0.6rem 0; }
+
+  /* Libreria in sessione */
+  .panel-head { display: flex; justify-content: space-between; align-items: baseline; gap: 0.5rem; }
+  .count { font-weight: 700; font-size: 0.95rem; color: var(--accent); }
+  .list { list-style: none; margin: 0.75rem 0 0; padding: 0; display: grid; gap: 0.5rem; }
+  .item { border: 1px solid var(--line); border-radius: 10px; padding: 0.7rem 0.8rem; background: var(--surface); }
+  .item.editing { border-color: var(--accent); box-shadow: 0 0 0 2px var(--accent-soft); }
+  .item .code { display: block; font-weight: 700; font-size: 0.9rem; overflow-wrap: anywhere; }
+  .item .title { display: block; font-size: 0.95rem; }
+  .item-meta { display: flex; flex-wrap: wrap; gap: 0.3rem 0.7rem; align-items: center; margin-top: 0.4rem; font-size: 0.82rem; color: var(--muted); }
+  .item-flag { margin: 0.4rem 0 0; font-size: 0.82rem; color: var(--warn); background: var(--warn-soft); border-radius: 6px; padding: 0.25rem 0.5rem; }
+  .item-actions { display: flex; flex-wrap: wrap; gap: 0.25rem; margin-top: 0.4rem; align-items: center; }
+  .item-actions .ask { font-size: 0.85rem; font-weight: 600; margin-right: 0.25rem; }
+  .badge { display: inline-block; font-size: 0.78rem; font-weight: 600; padding: 0.05rem 0.55rem; border-radius: 99px; background: var(--neutral-soft); color: var(--ink); }
+  .badge.s-attivo { background: var(--ok-soft); color: var(--ok); }
+  .badge.s-revisione { background: var(--warn-soft); color: var(--warn); }
+  .empty { margin: 0.75rem 0 0; padding: 1rem; border: 1.5px dashed var(--line-strong); border-radius: 10px; color: var(--muted); font-size: 0.92rem; }
+  .warnline { font-size: 0.85rem; color: var(--warn); margin: 0.6rem 0 0; }
+
+  .save, .drive { margin-top: 1.25rem; padding-top: 1.25rem; border-top: 1px solid var(--line); }
+  .status { font-size: 0.9rem; margin: 0.5rem 0 0; min-height: 1.2em; }
+  .status.err { color: var(--bad); font-weight: 500; }
+  .status.good { color: var(--ok); font-weight: 500; }
+  .confirm { background: var(--warn-soft); border: 1px solid var(--warn); border-radius: 10px; padding: 0.75rem; margin-top: 0.5rem; font-size: 0.9rem; }
+  .confirm p { margin: 0 0 0.5rem; }
+  details.settings { margin-top: 0.75rem; }
+  details.settings summary { cursor: pointer; font-weight: 600; font-size: 0.92rem; color: var(--accent); padding: 0.3rem 0; }
+  details.settings .field { margin-top: 0.75rem; }
+  .steps { margin: 0.75rem 0 0; padding-left: 1.2rem; font-size: 0.87rem; color: var(--muted); }
+  .steps li { margin-bottom: 0.35rem; }
+  .foot { margin: 2rem 0 0; font-size: 0.85rem; color: var(--muted); max-width: 70ch; }
+
+  #toasts { position: fixed; left: 50%; transform: translateX(-50%); bottom: calc(1rem + env(safe-area-inset-bottom, 0px)); display: grid; gap: 0.5rem; z-index: 50; width: min(92vw, 460px); pointer-events: none; }
+  .toast { background: var(--ink); color: var(--bg); padding: 0.7rem 1rem; border-radius: 10px; font-size: 0.92rem; font-weight: 500; box-shadow: 0 6px 24px rgba(0,0,0,0.25); }
+  .toast.error { background: var(--bad); color: #fff; }
+  :root[data-theme="dark"] .toast.error { color: #1a0a0a; }
+
+  [hidden] { display: none !important; }
+  .notice { background: var(--warn-soft); border: 1px solid var(--warn); border-left-width: 6px; border-radius: 12px; padding: 0.9rem 1.1rem; margin: 0 0 1.5rem; }
+  .notice p { margin: 0; max-width: 90ch; }
+  .notice p + p { margin-top: 0.4rem; }
+  .callout { border-left: 4px solid var(--warn); background: var(--warn-soft); border-radius: 0 10px 10px 0; padding: 0.85rem 1rem; }
+  .callout textarea { background: var(--surface); }
+  .banner.err { background: var(--bad-soft); border-color: var(--bad); margin: 1.25rem 0 0; font-weight: 600; }
+  .filters { display: grid; gap: 0.5rem; grid-template-columns: 1fr 1fr; margin-top: 0.75rem; }
+  .filters .wide { grid-column: 1 / -1; }
+  .filters input, .filters select { min-height: 2.5rem; font-size: 0.9rem; padding: 0.4rem 0.6rem; }
+  .item-state { margin: 0.4rem 0 0; font-size: 0.82rem; font-weight: 600; }
+  @media (prefers-reduced-motion: reduce) { * { transition: none !important; scroll-behavior: auto !important; } }
+</style>
+</head>
+<body>
+<div class="wrap">
+
+  <header class="top">
+    <div>
+      <h1>Libreria dei prompt</h1>
+      <p class="lead">Compila una scheda per ogni prompt, aggiungila alla libreria e salva il file quando hai finito. Pensata per il personale della pubblica amministrazione.</p>
+    </div>
+    <div>
+      <button type="button" class="btn" id="importBtn">Importa un file</button>
+      <input type="file" id="importFile" accept=".csv,.json,text/csv,application/json" hidden>
+    </div>
+  </header>
+
+  <div class="notice" role="note">
+    <p><strong>Demo didattica:</strong> questa libreria aiuta a organizzare, riutilizzare e controllare i prompt, ma non certifica la conformità normativa, la sicurezza dello strumento o la correttezza dell’output.</p>
+    <p>Usa solo dati fittizi o già pubblici. Non inserire dati personali, sanitari, giudiziari, riservati, documenti interni o informazioni relative a procedimenti reali.</p>
+  </div>
+
+  <div class="layout">
+
+    <main>
+      <form id="form" class="sheet" novalidate autocomplete="off">
+        <div id="editBanner" class="banner" role="status" hidden></div>
+        <p class="legend-req"><span class="req" aria-hidden="true">*</span> Campo obbligatorio</p>
+
+        <section class="sec" aria-labelledby="h-identita">
+          <h2 id="h-identita">Identità del prompt</h2>
+          <p class="sec-note">Come si chiama, a cosa serve e chi se ne occupa.</p>
+          <div class="grid two">
+            <div class="full">
+              <label for="codice">Codice <span class="req" aria-hidden="true">*</span></label>
+              <input type="text" id="codice" name="codice" spellcheck="false" autocapitalize="off" autocorrect="off" placeholder="SINT-CIRC_v1.2_2026-10" aria-describedby="hint-codice err-codice" aria-required="true">
+              <p class="hint" id="hint-codice">Convenzione: TIPO_vX.Y_AAAA-MM, ad esempio SINT-CIRC_v1.2_2026-10.</p>
+              <div class="anatomy" id="anatomy">
+                <div class="part empty" data-part="tipo"><span class="v">SINT-CIRC</span><span class="k">Tipo di prompt</span><span class="sr s"></span></div>
+                <div class="part empty" data-part="x"><span class="v">1</span><span class="k">Struttura dell’output (cambia raramente)</span><span class="sr s"></span></div>
+                <div class="part empty" data-part="y"><span class="v">2</span><span class="k">Vincoli e istruzioni</span><span class="sr s"></span></div>
+                <div class="part empty" data-part="date"><span class="v">2026-10</span><span class="k">Data di attivazione</span><span class="sr s"></span></div>
+              </div>
+              <p class="error" id="err-codice" data-error-for="codice"></p>
+            </div>
+
+            <div class="full">
+              <label for="titolo">Titolo <span class="req" aria-hidden="true">*</span></label>
+              <input type="text" id="titolo" name="titolo" placeholder="Sintesi di circolare" aria-describedby="hint-titolo err-titolo" aria-required="true">
+              <p class="hint" id="hint-titolo">Un nome comprensibile per chi cerca il prompt.</p>
+              <p class="error" id="err-titolo" data-error-for="titolo"></p>
+            </div>
+
+            <div class="full">
+              <label for="scopo">Scopo <span class="req" aria-hidden="true">*</span></label>
+              <textarea id="scopo" name="scopo" rows="2" placeholder="Ricavare oggetto, obblighi, scadenze e impatti per l’ufficio" aria-describedby="hint-scopo err-scopo" aria-required="true"></textarea>
+              <p class="hint" id="hint-scopo">Che risultato ottiene chi lo usa.</p>
+              <p class="error" id="err-scopo" data-error-for="scopo"></p>
+            </div>
+
+            <div>
+              <label for="owner">Owner / responsabile <span class="req" aria-hidden="true">*</span></label>
+              <input type="text" id="owner" name="owner" placeholder="Ufficio Affari generali" aria-describedby="hint-owner err-owner" aria-required="true">
+              <p class="hint" id="hint-owner">Ufficio o persona responsabile del prompt.</p>
+              <p class="error" id="err-owner" data-error-for="owner"></p>
+            </div>
+
+            <div>
+              <label for="versione">Versione</label>
+              <input type="text" id="versione" name="versione" readonly tabindex="-1" placeholder="Dal codice" aria-describedby="hint-versione">
+              <p class="hint" id="hint-versione">Si ricava dal codice: non serve compilarla.</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="sec" aria-labelledby="h-prompt">
+          <h2 id="h-prompt">Testo del prompt</h2>
+          <p class="sec-note">Il testo da copiare nello strumento.</p>
+          <div>
+            <label for="prompt">Prompt <span class="req" aria-hidden="true">*</span></label>
+            <textarea id="prompt" name="prompt" rows="10" class="tall" placeholder="Sei un assistente per gli uffici di un ente pubblico. Leggi il documento [DOCUMENTO] e prepara una sintesi per [UFFICIO]…" aria-describedby="hint-prompt err-prompt" aria-required="true"></textarea>
+            <p class="hint" id="hint-prompt">Indica i dati che chi lo usa deve inserire con dei segnaposto tra parentesi quadre, ad esempio [DOCUMENTO].</p>
+            <div class="chips" id="placeholders" aria-live="polite"></div>
+            <p class="error" id="err-prompt" data-error-for="prompt"></p>
+          </div>
+        </section>
+
+        <section class="sec" aria-labelledby="h-uso">
+          <h2 id="h-uso">Uso e controlli</h2>
+          <p class="sec-note">Cosa serve per usarlo bene e come controllare il risultato.</p>
+          <div class="grid two">
+            <div>
+              <label for="inputRichiesti">Input richiesti <span class="req" aria-hidden="true">*</span></label>
+              <textarea id="inputRichiesti" name="inputRichiesti" rows="3" placeholder="Documento PDF; ufficio destinatario; scopo della sintesi" aria-describedby="hint-input err-inputRichiesti" aria-required="true"></textarea>
+              <p class="hint" id="hint-input">Cosa deve avere a disposizione chi lo usa: documenti, dati, riferimenti.</p>
+              <p class="error" id="err-inputRichiesti" data-error-for="inputRichiesti"></p>
+            </div>
+
+            <div>
+              <label for="fontiAmmesse">Fonti ammesse <span class="req" aria-hidden="true">*</span></label>
+              <textarea id="fontiAmmesse" name="fontiAmmesse" rows="3" placeholder="Solo il documento allegato e le fonti ufficiali indicate" aria-describedby="hint-fonti err-fontiAmmesse" aria-required="true"></textarea>
+              <p class="hint" id="hint-fonti">Le sole fonti che lo strumento può usare.</p>
+              <p class="error" id="err-fontiAmmesse" data-error-for="fontiAmmesse"></p>
+            </div>
+
+            <div class="full">
+              <span class="label" id="lbl-livello">Livello di attenzione <span class="req" aria-hidden="true">*</span></span>
+              <div class="seg" role="radiogroup" aria-labelledby="lbl-livello" aria-describedby="hint-livello err-livelloAttenzione">
+                <label class="seg-opt" data-level="Ordinario"><input type="radio" name="livelloAttenzione" value="Ordinario"><span>Ordinario</span></label>
+                <label class="seg-opt" data-level="Attenzione moderata"><input type="radio" name="livelloAttenzione" value="Attenzione moderata"><span>Attenzione moderata</span></label>
+                <label class="seg-opt" data-level="Attenzione elevata"><input type="radio" name="livelloAttenzione" value="Attenzione elevata"><span>Attenzione elevata</span></label>
+              </div>
+              <p class="hint" id="hint-livello">Quanta verifica umana serve sul risultato: più l’attenzione è elevata, più i controlli devono essere accurati.</p>
+              <p class="error" id="err-livelloAttenzione" data-error-for="livelloAttenzione"></p>
+            </div>
+
+            <div class="full">
+              <label for="controlliOutput">Controlli sull’output <span class="req" aria-hidden="true">*</span></label>
+              <textarea id="controlliOutput" name="controlliOutput" rows="3" placeholder="Aprire le citazioni; controllare date, soggetti, obblighi e omissioni" aria-describedby="hint-controlli err-controlliOutput" aria-required="true"></textarea>
+              <p class="hint" id="hint-controlli">Cosa verificare prima di usare il risultato.</p>
+              <p class="error" id="err-controlliOutput" data-error-for="controlliOutput"></p>
+            </div>
+
+            <div class="full callout">
+              <label for="limitiUso">Limiti d’uso <span class="req" aria-hidden="true">*</span></label>
+              <textarea id="limitiUso" name="limitiUso" rows="3" placeholder="Non usare per decidere o redigere atti definitivi" aria-describedby="hint-limiti err-limitiUso" aria-required="true"></textarea>
+              <p class="hint" id="hint-limiti">Indica quando il prompt NON deve essere usato.</p>
+              <p class="error" id="err-limitiUso" data-error-for="limitiUso"></p>
+            </div>
+          </div>
+        </section>
+
+        <section class="sec" aria-labelledby="h-gov">
+          <h2 id="h-gov">Stato e strumento</h2>
+          <p class="sec-note">A che punto è il prompt e dove si può usare.</p>
+          <div class="grid two">
+            <div>
+              <label for="stato">Stato <span class="req" aria-hidden="true">*</span></label>
+              <select id="stato" name="stato" aria-describedby="hint-stato err-stato" aria-required="true">
+                <option value="">Scegli lo stato</option>
+                <option value="Bozza">Bozza — non ancora verificato</option>
+                <option value="In revisione">In revisione — in fase di prova e controllo</option>
+                <option value="Attivo">Attivo — disponibile entro i limiti indicati</option>
+                <option value="Archiviato">Archiviato — superato o non più utilizzabile</option>
+              </select>
+              <p class="hint" id="hint-stato">Un prompt attivo può essere modificato o disattivato se cambiano fonti, strumenti, procedimenti o regole dell’ente.</p>
+              <p class="error" id="err-stato" data-error-for="stato"></p>
+            </div>
+
+            <div>
+              <label for="strumentoAutorizzato">Strumento autorizzato <span class="req" aria-hidden="true">*</span></label>
+              <select id="strumentoAutorizzato" name="strumentoAutorizzato" aria-describedby="err-strumentoAutorizzato" aria-required="true">
+                <option value="">Scegli lo strumento</option>
+                <option>Google Workspace</option>
+                <option>Microsoft 365 Copilot</option>
+                <option>ChatGPT Team</option>
+                <option value="Altro">Altro</option>
+              </select>
+              <div id="altroWrap" hidden style="margin-top:0.5rem">
+                <label for="strumentoAltro" class="sr">Quale strumento</label>
+                <input type="text" id="strumentoAltro" name="strumentoAltro" placeholder="Indica quale strumento">
+              </div>
+              <p class="error" id="err-strumentoAutorizzato" data-error-for="strumentoAutorizzato"></p>
+            </div>
+
+            <div>
+              <label for="ultimaRevisione">Ultima revisione <span class="req" aria-hidden="true">*</span></label>
+              <input type="date" id="ultimaRevisione" name="ultimaRevisione" aria-describedby="hint-rev err-ultimaRevisione" aria-required="true">
+              <p class="hint" id="hint-rev">Data dell’ultimo controllo del prompt.</p>
+              <p class="error" id="err-ultimaRevisione" data-error-for="ultimaRevisione"></p>
+            </div>
+
+            <div>
+              <label for="dataAggiornamento">Data aggiornamento</label>
+              <input type="date" id="dataAggiornamento" name="dataAggiornamento" aria-describedby="hint-agg err-dataAggiornamento">
+              <p class="hint" id="hint-agg">Facoltativo. Data dell’ultima modifica, se diversa.</p>
+              <p class="error" id="err-dataAggiornamento" data-error-for="dataAggiornamento"></p>
+            </div>
+
+            <div class="full">
+              <label for="note">Note</label>
+              <textarea id="note" name="note" rows="2" placeholder="Output sempre da verificare" aria-describedby="hint-note"></textarea>
+              <p class="hint" id="hint-note">Facoltativo.</p>
+            </div>
+          </div>
+        </section>
+
+        <div id="incompleteMsg" class="banner err" role="alert" hidden></div>
+
+        <div class="actions">
+          <button type="submit" class="btn primary" id="submitBtn">Aggiungi alla libreria</button>
+          <button type="button" class="btn" id="clearBtn">Svuota la scheda</button>
+          <button type="button" class="btn" id="cancelEditBtn" hidden>Annulla la modifica</button>
+        </div>
+      </form>
+      <p class="foot">I dati restano nel browser, salvo quando scegli esplicitamente una funzione di salvataggio o un’integrazione esterna. Non inserire dati riservati. Attivando Google Drive, i dati della libreria vengono trasferiti a Google e sono soggetti alle sue condizioni.</p>
+    </main>
+
+    <aside class="side panel" id="library" aria-labelledby="h-lib">
+      <div class="panel-head">
+        <h2 id="h-lib">Libreria in sessione</h2>
+        <span class="count" id="count">0 prompt</span>
+      </div>
+      <p class="hint" id="saveState"></p>
+
+      <div class="filters" id="filters" hidden>
+        <div class="wide">
+          <label for="fSearch" class="sr">Cerca per codice o titolo</label>
+          <input type="search" id="fSearch" placeholder="Cerca per codice o titolo">
+        </div>
+        <div>
+          <label for="fStato" class="sr">Filtra per stato</label>
+          <select id="fStato">
+            <option value="">Tutti gli stati</option>
+            <option>Bozza</option>
+            <option>In revisione</option>
+            <option>Attivo</option>
+            <option>Archiviato</option>
+          </select>
+        </div>
+        <div>
+          <label for="fLivello" class="sr">Filtra per livello di attenzione</label>
+          <select id="fLivello">
+            <option value="">Tutti i livelli</option>
+            <option>Ordinario</option>
+            <option>Attenzione moderata</option>
+            <option>Attenzione elevata</option>
+          </select>
+        </div>
+        <div class="wide">
+          <label for="fSort" class="sr">Ordina per data di aggiornamento</label>
+          <select id="fSort">
+            <option value="">Ordine di inserimento</option>
+            <option value="desc">Data di aggiornamento: dalla più recente</option>
+            <option value="asc">Data di aggiornamento: dalla meno recente</option>
+          </select>
+        </div>
+      </div>
+      <p class="hint" id="filterNote" hidden></p>
+
+      <ul class="list" id="list"></ul>
+      <p class="empty" id="noResults" hidden>Nessuna scheda corrisponde a ricerca e filtri. <button type="button" class="btn link" id="resetFilters">Azzera i filtri</button></p>
+      <p class="empty" id="empty">Nessun prompt in libreria. Compila la scheda e premi «Aggiungi alla libreria», oppure importa un file esistente.</p>
+      <p class="warnline" id="flagged" hidden></p>
+
+      <div class="save">
+        <h3>Salva il file</h3>
+        <div class="btn-row">
+          <button type="button" class="btn primary" id="dlCsv">Scarica CSV</button>
+          <button type="button" class="btn" id="dlJson">Scarica JSON</button>
+        </div>
+        <p class="hint">Il CSV si apre in Excel (separatore «;», codifica UTF-8). Se il download non parte, <button type="button" class="btn link" id="cpCsv">copia il CSV</button> o <button type="button" class="btn link" id="cpJson">copia il JSON</button> negli appunti.</p>
+      </div>
+
+      <div class="drive">
+        <h3>Google Drive</h3>
+        <p class="hint" id="driveHint"></p>
+        <div class="seg small" role="radiogroup" aria-label="Formato del file su Drive">
+          <label class="seg-opt"><input type="radio" name="driveFormat" value="csv" checked><span>CSV</span></label>
+          <label class="seg-opt"><input type="radio" name="driveFormat" value="json"><span>JSON</span></label>
+        </div>
+        <div class="btn-row">
+          <button type="button" class="btn primary" id="driveSave">Salva su Drive</button>
+          <button type="button" class="btn" id="driveLoad">Carica da Drive</button>
+        </div>
+        <div class="confirm" id="driveConfirm" hidden>
+          <p id="driveConfirmText"></p>
+          <div class="btn-row" style="margin:0">
+            <button type="button" class="btn small primary" id="driveReplace">Sostituisci il file</button>
+            <button type="button" class="btn small" id="driveLoadFirst">Carica prima da Drive</button>
+            <button type="button" class="btn small" id="driveCancel">Annulla</button>
+          </div>
+        </div>
+        <p class="status" id="driveStatus" role="status" aria-live="polite"></p>
+
+        <details class="settings">
+          <summary>Impostazioni e guida</summary>
+          <div class="field">
+            <label for="driveName">Nome del file</label>
+            <input type="text" id="driveName" value="libreria_prompt">
+            <p class="hint">L’estensione si aggiunge da sola.</p>
+          </div>
+          <div class="field">
+            <label for="clientId">Client ID Google</label>
+            <input type="text" id="clientId" spellcheck="false" placeholder="123456789-abc….apps.googleusercontent.com">
+            <p class="hint">Lo fornisce l’amministratore dell’ente. In alternativa si scrive una volta sola nel file, nella costante <code>GOOGLE_CLIENT_ID</code>.</p>
+          </div>
+          <ol class="steps">
+            <li>In Google Cloud Console crea un progetto, attiva l’API Google Drive e configura la schermata di consenso OAuth.</li>
+            <li>In Credenziali crea un ID client OAuth di tipo «Applicazione web» e aggiungi l’indirizzo di questa pagina tra le «Origini JavaScript autorizzate».</li>
+            <li>Copia il Client ID qui sopra: il pulsante «Salva su Drive» si attiva.</li>
+          </ol>
+          <p class="hint">Questa pagina chiede il permesso minimo di Drive: vede e aggiorna solo i file che ha creato lei.</p>
+        </details>
+      </div>
+    </aside>
+
+  </div>
+</div>
+
+<div id="toasts" role="status" aria-live="polite"></div>
+
+<script>
+(() => {
+  'use strict';
+
+  /* ------------------------------------------------------------------
+     Configurazione: inserisci qui il Client ID OAuth di Google dell'ente
+     (oppure incollalo nel campo «Impostazioni e guida» della pagina).
+     ------------------------------------------------------------------ */
+  const GOOGLE_CLIENT_ID = '';
+
+  const FIELDS = [
+    { key: 'codice',             label: 'Codice' },
+    { key: 'titolo',             label: 'Titolo' },
+    { key: 'scopo',              label: 'Scopo' },
+    { key: 'prompt',             label: 'Prompt' },
+    { key: 'owner',              label: 'Owner' },
+    { key: 'versione',           label: 'Versione' },
+    { key: 'dataAggiornamento',  label: 'Data aggiornamento' },
+    { key: 'stato',              label: 'Stato' },
+    { key: 'inputRichiesti',     label: 'Input richiesti' },
+    { key: 'fontiAmmesse',       label: 'Fonti ammesse' },
+    { key: 'livelloAttenzione',  label: 'Livello di attenzione' },
+    { key: 'controlliOutput',    label: 'Controlli sull\u2019output' },
+    { key: 'limitiUso',          label: 'Limiti d\u2019uso' },
+    { key: 'strumentoAutorizzato', label: 'Strumento autorizzato' },
+    { key: 'ultimaRevisione',    label: 'Ultima revisione' },
+    { key: 'note',               label: 'Note' }
+  ];
+  const STATI = ['Bozza', 'In revisione', 'Attivo', 'Archiviato'];
+  const LIVELLI = ['Ordinario', 'Attenzione moderata', 'Attenzione elevata'];
+  const LEGACY_LEVELS = { basso: 'Ordinario', medio: 'Attenzione moderata', alto: 'Attenzione elevata' };
+  const INCOMPLETE_MSG = 'Scheda incompleta: completa i campi obbligatori prima di considerare il prompt pronto per la revisione.';
+  const STATE_LABEL = { 'Bozza': 'Prompt documentato', 'In revisione': 'Pronto per la revisione dell\u2019ente', 'Attivo': 'Attivo entro i limiti indicati' };
+  const TOOLS = ['Google Workspace', 'Microsoft 365 Copilot', 'ChatGPT Team'];
+  const REQUIRED = ['titolo', 'scopo', 'prompt', 'owner', 'inputRichiesti', 'fontiAmmesse', 'controlliOutput', 'limitiUso', 'ultimaRevisione'];
+
+  const norm = s => String(s).normalize('NFD').replace(/[\u0300-\u036f]/g, '').toLowerCase().replace(/[^a-z0-9]/g, '');
+  const KEYMAP = {};
+  FIELDS.forEach(f => { KEYMAP[norm(f.key)] = f.key; KEYMAP[norm(f.label)] = f.key; });
+  const labelOf = key => key === 'owner' ? 'Owner/responsabile' : (FIELDS.find(f => f.key === key) || { label: key }).label;
+
+  const $ = s => document.querySelector(s);
+  const form = $('#form');
+  const reduceMotion = window.matchMedia('(prefers-reduced-motion: reduce)').matches;
+
+  let items = [];
+  let editIndex = -1;
+  let pendingDelete = -1;
+  let dirty = false;
+  let codeTouched = false;
+
+  /* ------------------------------ utilità ------------------------------ */
+  function h(tag, props, ...kids) {
+    const el = document.createElement(tag);
+    Object.entries(props || {}).forEach(([k, v]) => {
+      if (k === 'class') el.className = v;
+      else if (k === 'text') el.textContent = v;
+      else el.setAttribute(k, v);
+    });
+    kids.flat().forEach(c => { if (c != null && c !== false) el.append(c.nodeType ? c : document.createTextNode(c)); });
+    return el;
+  }
+  function todayISO() {
+    const d = new Date();
+    return d.getFullYear() + '-' + String(d.getMonth() + 1).padStart(2, '0') + '-' + String(d.getDate()).padStart(2, '0');
+  }
+  function toast(msg, kind) {
+    const t = h('div', { class: 'toast' + (kind === 'error' ? ' error' : ''), text: msg });
+    $('#toasts').append(t);
+    setTimeout(() => t.remove(), kind === 'error' ? 6000 : 4000);
+  }
+  function emptyRecord() { const r = {}; FIELDS.forEach(f => { r[f.key] = ''; }); return r; }
+
+  /* --------------------------- codice e validazione --------------------------- */
+  function codeCheck(raw) {
+    const code = (raw || '').trim();
+    const res = { empty: code === '', tipo: '', x: '', y: '', date: '', p1: '', p2: '', nparts: 0,
+                  tipoOk: false, verOk: false, dateOk: false, valid: false, message: '' };
+    if (code === '') { res.message = 'Inserisci il codice.'; return res; }
+    const parts = code.split('_');
+    res.nparts = parts.length;
+    res.tipo = parts[0] || ''; res.p1 = parts[1] || ''; res.p2 = parts[2] || '';
+    res.tipoOk = /^[A-Z][A-Z0-9]*(-[A-Z0-9]+)*$/.test(res.tipo);
+    const m = /^v(\d+)\.(\d+)$/.exec(res.p1);
+    if (m) { res.verOk = true; res.x = m[1]; res.y = m[2]; }
+    if (/^\d{4}-(0[1-9]|1[0-2])$/.test(res.p2)) { res.dateOk = true; res.date = res.p2; }
+    if (parts.length !== 3) {
+      res.message = 'Il codice ha tre parti separate da «_»: TIPO_vX.Y_AAAA-MM, ad esempio SINT-CIRC_v1.2_2026-10.';
+    } else if (!res.tipoOk) {
+      res.message = 'Il tipo va scritto in lettere maiuscole e numeri, con trattini al posto degli spazi: ad esempio SINT-CIRC.';
+    } else if (!res.verOk) {
+      res.message = 'La versione va scritta come vX.Y, ad esempio v1.2.';
+    } else if (!res.dateOk) {
+      res.message = 'La data di attivazione va scritta come AAAA-MM, ad esempio 2026-10.';
+    } else {
+      res.valid = true;
+    }
+    return res;
+  }
+  function versionFromCode(code) { const c = codeCheck(code); return c.valid ? 'v' + c.x + '.' + c.y : ''; }
+
+  function missingKeys(r) {
+    const m = new Set();
+    if (!(r.codice || '').trim()) m.add('codice');
+    REQUIRED.forEach(k => { if (!(r[k] || '').trim()) m.add(k); });
+    if (!(r.stato || '').trim()) m.add('stato');
+    if (!(r.livelloAttenzione || '').trim()) m.add('livelloAttenzione');
+    const t = (r.strumentoAutorizzato || '').trim();
+    if (!t || t === 'Altro') m.add('strumentoAutorizzato');
+    return FIELDS.map(f => f.key).filter(k => m.has(k));
+  }
+
+  function validateRecord(r) {
+    const e = {};
+    const c = codeCheck(r.codice);
+    if (!c.valid) e.codice = c.message;
+    REQUIRED.forEach(k => { if (!(r[k] || '').trim()) e[k] = 'Campo obbligatorio.'; });
+    if (!STATI.includes(r.stato)) e.stato = r.stato ? 'Nel file era indicato «' + r.stato + '»: scegli uno dei valori previsti.' : 'Scegli lo stato.';
+    if (!LIVELLI.includes(r.livelloAttenzione)) e.livelloAttenzione = r.livelloAttenzione ? 'Nel file era indicato «' + r.livelloAttenzione + '»: scegli Ordinario, Attenzione moderata o Attenzione elevata.' : 'Scegli il livello di attenzione.';
+    const t = r.strumentoAutorizzato || '';
+    if (!(TOOLS.includes(t) || /^Altro: ?\S/.test(t))) {
+      e.strumentoAutorizzato = !t ? 'Scegli lo strumento.' : (t === 'Altro' ? 'Indica quale strumento.' : 'Nel file era indicato «' + t + '»: scegli uno strumento dell’elenco o «Altro».');
+    }
+    if (r.ultimaRevisione && !/^\d{4}-\d{2}-\d{2}$/.test(r.ultimaRevisione)) e.ultimaRevisione = 'Usa una data valida.';
+    if (r.dataAggiornamento && !/^\d{4}-\d{2}-\d{2}$/.test(r.dataAggiornamento)) e.dataAggiornamento = 'Usa una data valida.';
+    return e;
+  }
+
+  /* --------------------------- gestione del form --------------------------- */
+  function setError(name, msg) {
+    const el = document.querySelector('[data-error-for="' + name + '"]');
+    if (el) el.textContent = msg || '';
+  }
+  function controlFor(key) {
+    if (key === 'strumentoAutorizzato' && form.elements.strumentoAutorizzato.value === 'Altro') return form.elements.strumentoAltro;
+    const el = form.elements[key];
+    return el instanceof RadioNodeList ? el[0] : el;
+  }
+  function clearErrors() {
+    document.querySelectorAll('[data-error-for]').forEach(el => { el.textContent = ''; });
+    form.querySelectorAll('[aria-invalid]').forEach(el => el.removeAttribute('aria-invalid'));
+    $('#incompleteMsg').hidden = true;
+  }
+  function showErrors(errs) {
+    clearErrors();
+    Object.entries(errs).forEach(([key, msg]) => {
+      setError(key, msg);
+      const el = controlFor(key);
+      if (el && el.setAttribute && key !== 'livelloAttenzione') el.setAttribute('aria-invalid', 'true');
+    });
+  }
+  function focusFirst(errs) {
+    const first = FIELDS.map(f => f.key).find(k => errs[k]);
+    const el = first && controlFor(first);
+    if (el && el.focus) el.focus();
+  }
+
+  function setPart(name, val, state) {
+    const el = document.querySelector('[data-part="' + name + '"]');
+    el.className = 'part ' + state;
+    el.querySelector('.v').textContent = val;
+    el.querySelector('.s').textContent = state === 'ok' ? 'valido' : state === 'bad' ? 'non valido' : '';
+  }
+  function renderAnatomy() {
+    const c = codeCheck(form.elements.codice.value);
+    const ex = { tipo: 'SINT-CIRC', x: '1', y: '2', date: '2026-10' };
+    form.elements.versione.value = c.valid ? 'v' + c.x + '.' + c.y : '';
+    if (c.empty) {
+      setPart('tipo', ex.tipo, 'empty'); setPart('x', ex.x, 'empty'); setPart('y', ex.y, 'empty'); setPart('date', ex.date, 'empty');
+      return;
+    }
+    const st = (has, ok) => !has ? 'empty' : ok ? 'ok' : (codeTouched ? 'bad' : 'typing');
+    const hasT = c.tipo !== '' || c.nparts > 1;
+    setPart('tipo', c.tipo || (hasT ? '\u2014' : ex.tipo), st(hasT, c.tipoOk));
+    const hasV = c.nparts > 1;
+    const vs = st(hasV, c.verOk);
+    setPart('x', c.verOk ? c.x : (hasV ? (c.p1 || '\u2014') : ex.x), vs);
+    setPart('y', c.verOk ? c.y : (hasV ? '\u2014' : ex.y), vs);
+    const hasD = c.nparts > 2;
+    setPart('date', c.dateOk ? c.date : (hasD ? (c.p2 || '\u2014') : ex.date), st(hasD, c.dateOk));
+  }
+  function renderPlaceholders() {
+    const box = $('#placeholders');
+    box.textContent = '';
+    const found = [...new Set((form.elements.prompt.value.match(/\[[^\]\n]{1,40}\]/g) || []))];
+    if (!found.length) return;
+    box.append(h('span', { class: 'lbl', text: 'Segnaposto riconosciuti:' }));
+    found.forEach(p => box.append(h('span', { class: 'chip', text: p })));
+  }
+  function toggleAltro() {
+    const show = form.elements.strumentoAutorizzato.value === 'Altro';
+    $('#altroWrap').hidden = !show;
+  }
+
+  function readForm() {
+    const r = emptyRecord();
+    FIELDS.forEach(f => {
+      const el = form.elements[f.key];
+      r[f.key] = el ? String(el.value || '').trim() : '';
+    });
+    r.versione = versionFromCode(r.codice);
+    const s = form.elements.strumentoAutorizzato.value;
+    const altro = form.elements.strumentoAltro.value.trim();
+    r.strumentoAutorizzato = s === 'Altro' ? (altro ? 'Altro: ' + altro : 'Altro') : s;
+    return r;
+  }
+  function setSelect(el, val, list) { el.value = list.includes(val) ? val : ''; }
+  function fillForm(r) {
+    FIELDS.forEach(f => {
+      const el = form.elements[f.key];
+      if (!el || f.key === 'stato' || f.key === 'livelloAttenzione' || f.key === 'strumentoAutorizzato' || f.key === 'versione') return;
+      el.value = r[f.key] || '';
+    });
+    setSelect(form.elements.stato, r.stato, STATI);
+    form.querySelectorAll('input[name="livelloAttenzione"]').forEach(i => { i.checked = i.value === r.livelloAttenzione; });
+    const t = r.strumentoAutorizzato || '';
+    const sel = form.elements.strumentoAutorizzato;
+    const altro = form.elements.strumentoAltro;
+    altro.value = '';
+    if (TOOLS.includes(t)) { sel.value = t; }
+    else if (/^Altro:\s*/.test(t)) { sel.value = 'Altro'; altro.value = t.replace(/^Altro:\s*/, ''); }
+    else if (t && t !== 'Altro') { sel.value = 'Altro'; altro.value = t; }
+    else if (t === 'Altro') { sel.value = 'Altro'; }
+    else { sel.value = ''; }
+    toggleAltro(); renderAnatomy(); renderPlaceholders();
+  }
+  function resetForm(keepOwner) {
+    const owner = form.elements.owner.value;
+    form.reset();
+    form.elements.owner.value = keepOwner ? owner : '';
+    form.elements.stato.value = 'Bozza';
+    form.elements.ultimaRevisione.value = todayISO();
+    form.querySelectorAll('input[name="livelloAttenzione"]').forEach(i => { i.checked = false; });
+    codeTouched = false;
+    clearErrors(); toggleAltro(); renderAnatomy(); renderPlaceholders();
+  }
+  function enterEdit(i) {
+    editIndex = i;
+    const r = items[i];
+    codeTouched = true;
+    fillForm(r);
+    showErrors(validateRecord(r));
+    $('#incompleteMsg').hidden = missingKeys(r).length === 0;
+    $('#editBanner').textContent = 'Stai modificando «' + r.codice + '». Le modifiche si applicano quando premi «Salva le modifiche».';
+    $('#editBanner').hidden = false;
+    $('#submitBtn').textContent = 'Salva le modifiche';
+    $('#cancelEditBtn').hidden = false;
+    $('#clearBtn').hidden = true;
+    window.scrollTo({ top: 0, behavior: reduceMotion ? 'auto' : 'smooth' });
+    form.elements.codice.focus({ preventScroll: true });
+    renderList();
+  }
+  function leaveEdit() {
+    editIndex = -1;
+    $('#editBanner').hidden = true;
+    $('#submitBtn').textContent = 'Aggiungi alla libreria';
+    $('#cancelEditBtn').hidden = true;
+    $('#clearBtn').hidden = false;
+  }
+
+  form.addEventListener('input', e => {
+    const t = e.target;
+    if (!t.name) return;
+    setError(t.name === 'strumentoAltro' ? 'strumentoAutorizzato' : t.name, '');
+    t.removeAttribute('aria-invalid');
+    if (t.name === 'strumentoAutorizzato') { toggleAltro(); form.elements.strumentoAltro.removeAttribute('aria-invalid'); }
+    if (t.name === 'codice') renderAnatomy();
+    if (t.name === 'prompt') renderPlaceholders();
+    if (!$('#incompleteMsg').hidden && missingKeys(readForm()).length === 0) $('#incompleteMsg').hidden = true;
+  });
+  form.elements.codice.addEventListener('blur', () => {
+    codeTouched = true;
+    renderAnatomy();
+    const c = codeCheck(form.elements.codice.value);
+    if (!c.empty && !c.valid) {
+      setError('codice', c.message);
+      form.elements.codice.setAttribute('aria-invalid', 'true');
+    }
+  });
+
+  form.addEventListener('submit', e => {
+    e.preventDefault();
+    codeTouched = true;
+    renderAnatomy();
+    const rec = readForm();
+    const errs = validateRecord(rec);
+    if (!errs.codice) {
+      const dup = items.findIndex((x, i) => i !== editIndex && x.codice.toLowerCase() === rec.codice.toLowerCase());
+      if (dup > -1) errs.codice = 'Esiste già una scheda con questo codice. Per una nuova versione cambia la parte vX.Y.';
+    }
+    showErrors(errs);
+    const missing = missingKeys(rec);
+    $('#incompleteMsg').hidden = missing.length === 0;
+    if (Object.keys(errs).length) {
+      focusFirst(errs);
+      toast(missing.length ? INCOMPLETE_MSG : 'Controlla i campi evidenziati.', 'error');
+      return;
+    }
+    if (editIndex > -1) {
+      items[editIndex] = rec;
+      toast('Modifiche salvate: ' + rec.codice);
+      leaveEdit();
+      resetForm(false);
+    } else {
+      items.push(rec);
+      toast('Aggiunto alla libreria: ' + rec.codice);
+      resetForm(true);
+    }
+    dirty = true;
+    renderList();
+  });
+  $('#clearBtn').addEventListener('click', () => resetForm(false));
+  $('#cancelEditBtn').addEventListener('click', () => { leaveEdit(); resetForm(false); renderList(); });
+
+  /* --------------------------- elenco in sessione --------------------------- */
+  function badgeClass(stato) {
+    return 'badge' + (stato === 'Attivo' ? ' s-attivo' : stato === 'In revisione' ? ' s-revisione' : '');
+  }
+  const names = keys => keys.map(k => labelOf(k).toLowerCase()).join(', ');
+  function viewItems() {
+    const toks = $('#fSearch').value.split(/\s+/).map(norm).filter(Boolean);
+    const fs = $('#fStato').value, fl = $('#fLivello').value, so = $('#fSort').value;
+    const v = items.map((r, i) => ({ r, i })).filter(({ r }) => {
+      const hay = norm(r.codice + ' ' + r.titolo);
+      return toks.every(t => hay.includes(t)) && (!fs || r.stato === fs) && (!fl || r.livelloAttenzione === fl);
+    });
+    if (so) {
+      v.sort((a, b) => {
+        const da = a.r.dataAggiornamento, db = b.r.dataAggiornamento;
+        if (!da && !db) return a.i - b.i;
+        if (!da) return 1;
+        if (!db) return -1;
+        return (so === 'desc' ? db.localeCompare(da) : da.localeCompare(db)) || a.i - b.i;
+      });
+    }
+    return v;
+  }
+  function renderList() {
+    const ul = $('#list');
+    ul.textContent = '';
+    const n = items.length;
+    const view = viewItems();
+    view.forEach(({ r, i }) => {
+      const missing = missingKeys(r);
+      const errs = validateRecord(r);
+      const other = Object.keys(errs).filter(k => !missing.includes(k));
+      const li = h('li', { class: 'item' + (i === editIndex ? ' editing' : '') });
+      li.append(h('span', { class: 'code', text: r.codice || '(senza codice)' }));
+      li.append(h('span', { class: 'title', text: r.titolo || '(senza titolo)' }));
+      const meta = h('div', { class: 'item-meta' });
+      if (r.stato) meta.append(h('span', { class: badgeClass(r.stato), text: r.stato }));
+      if (r.livelloAttenzione) meta.append(h('span', { text: 'Livello: ' + r.livelloAttenzione }));
+      li.append(meta);
+      if (missing.length) {
+        li.append(h('p', { class: 'item-flag', text: INCOMPLETE_MSG + ' Mancano: ' + names(missing) + '.' }));
+      } else if (other.length) {
+        li.append(h('p', { class: 'item-flag', text: 'Da revisionare. Da adeguare: ' + names(other) + '.' }));
+      } else if (STATE_LABEL[r.stato]) {
+        li.append(h('p', { class: 'item-state', text: STATE_LABEL[r.stato] }));
+      }
+      const act = h('div', { class: 'item-actions' });
+      if (pendingDelete === i) {
+        act.append(h('span', { class: 'ask', text: 'Eliminare questa scheda?' }));
+        act.append(h('button', { type: 'button', class: 'btn small danger', 'data-act': 'confirm-del', 'data-i': i, text: 'Sì, elimina' }));
+        act.append(h('button', { type: 'button', class: 'btn small', 'data-act': 'cancel-del', 'data-i': i, text: 'Annulla' }));
+      } else {
+        act.append(h('button', { type: 'button', class: 'btn small', 'data-act': 'edit', 'data-i': i, text: 'Modifica' }));
+        act.append(h('button', { type: 'button', class: 'btn small', 'data-act': 'del', 'data-i': i, text: 'Elimina' }));
+      }
+      li.append(act);
+      ul.append(li);
+    });
+
+    const shown = view.length;
+    const active = !!($('#fSearch').value.trim() || $('#fStato').value || $('#fLivello').value);
+    $('#count').textContent = shown === n ? n + ' prompt' : shown + ' di ' + n + ' prompt';
+    $('#filters').hidden = n === 0;
+    $('#empty').hidden = n > 0;
+    $('#noResults').hidden = !(n > 0 && shown === 0);
+    const fn = $('#filterNote');
+    fn.hidden = !(n > 0 && active);
+    fn.textContent = 'Filtri attivi: l\u2019esportazione e il salvataggio includono comunque tutte le ' + n + ' schede.';
+    const flagged = items.filter(r => Object.keys(validateRecord(r)).length).length;
+    const fl = $('#flagged');
+    fl.hidden = flagged === 0;
+    if (flagged) fl.textContent = flagged === 1 ? '1 scheda da completare o adeguare.' : flagged + ' schede da completare o adeguare.';
+    $('#saveState').textContent = n === 0 ? 'Aggiungi almeno un prompt per poter salvare.' : dirty ? 'Ci sono modifiche non ancora salvate.' : 'Nessuna modifica in sospeso.';
+    updateButtons();
+  }
+  $('#list').addEventListener('click', e => {
+    const b = e.target.closest('button[data-act]');
+    if (!b) return;
+    const i = Number(b.dataset.i);
+    const act = b.dataset.act;
+    if (act === 'edit') { pendingDelete = -1; enterEdit(i); return; }
+    if (act === 'del') { pendingDelete = i; renderList(); return; }
+    if (act === 'cancel-del') { pendingDelete = -1; renderList(); return; }
+    if (act === 'confirm-del') {
+      const code = items[i].codice;
+      items.splice(i, 1);
+      pendingDelete = -1;
+      if (editIndex === i) { leaveEdit(); resetForm(false); }
+      else if (editIndex > i) editIndex--;
+      dirty = true;
+      renderList();
+      toast('Scheda eliminata: ' + code);
+    }
+  });
+
+  /* --------------------------- esportazione --------------------------- */
+  const csvEsc = v => /[;"\r\n]/.test(v) ? '"' + v.replace(/"/g, '""') + '"' : v;
+  function toCSV(rows) {
+    const head = FIELDS.map(f => csvEsc(f.label)).join(';');
+    const body = rows.map(r => FIELDS.map(f => csvEsc(r[f.key] || '')).join(';'));
+    return [head, ...body].join('\r\n') + '\r\n';
+  }
+  function toJSONText(rows) {
+    return JSON.stringify({
+      libreria: 'Libreria di prompt',
+      esportatoIl: new Date().toISOString(),
+      prompt: rows.map(r => { const o = {}; FIELDS.forEach(f => { o[f.key] = r[f.key] || ''; }); return o; })
+    }, null, 2) + '\n';
+  }
+  function downloadFile(name, mime, content) {
+    const blob = new Blob([content], { type: mime + ';charset=utf-8' });
+    const url = URL.createObjectURL(blob);
+    const a = h('a', { href: url, download: name });
+    document.body.append(a);
+    a.click();
+    a.remove();
+    setTimeout(() => URL.revokeObjectURL(url), 2000);
+  }
+  function markSaved() { dirty = false; renderList(); }
+  $('#dlCsv').addEventListener('click', () => {
+    const name = 'libreria_prompt_' + todayISO() + '.csv';
+    downloadFile(name, 'text/csv', '\ufeff' + toCSV(items));
+    toast('File scaricato: ' + name);
+    markSaved();
+  });
+  $('#dlJson').addEventListener('click', () => {
+    const name = 'libreria_prompt_' + todayISO() + '.json';
+    downloadFile(name, 'application/json', toJSONText(items));
+    toast('File scaricato: ' + name);
+    markSaved();
+  });
+  async function copyText(text, what) {
+    try {
+      await navigator.clipboard.writeText(text);
+    } catch (_) {
+      const ta = h('textarea', { 'aria-hidden': 'true' });
+      ta.value = text; ta.style.position = 'fixed'; ta.style.opacity = '0';
+      document.body.append(ta); ta.select();
+      let ok = false;
+      try { ok = document.execCommand('copy'); } catch (__) { ok = false; }
+      ta.remove();
+      if (!ok) { toast('Non riesco a copiare negli appunti da questa pagina.', 'error'); return; }
+    }
+    toast(what + ' copiato negli appunti.');
+    markSaved();
+  }
+  $('#cpCsv').addEventListener('click', () => { if (items.length) copyText(toCSV(items), 'CSV'); else toast('La libreria è vuota.', 'error'); });
+  $('#cpJson').addEventListener('click', () => { if (items.length) copyText(toJSONText(items), 'JSON'); else toast('La libreria è vuota.', 'error'); });
+
+  /* --------------------------- importazione --------------------------- */
+  function parseCSV(text) {
+    const first = text.split(/\r?\n/)[0] || '';
+    const delim = first.split(';').length >= first.split(',').length ? ';' : ',';
+    const rows = [];
+    let row = [], cur = '', q = false;
+    for (let i = 0; i < text.length; i++) {
+      const c = text[i];
+      if (q) {
+        if (c === '"') { if (text[i + 1] === '"') { cur += '"'; i++; } else q = false; }
+        else cur += c;
+      } else if (c === '"') q = true;
+      else if (c === delim) { row.push(cur); cur = ''; }
+      else if (c === '\n') { row.push(cur); rows.push(row); row = []; cur = ''; }
+      else if (c !== '\r') cur += c;
+    }
+    if (cur !== '' || row.length) { row.push(cur); rows.push(row); }
+    return rows.filter(r => r.some(c => c.trim() !== ''));
+  }
+  function cleanRecord(r) {
+    FIELDS.forEach(f => { r[f.key] = (r[f.key] == null ? '' : String(r[f.key])).trim(); });
+    const lv = LEGACY_LEVELS[r.livelloAttenzione.toLowerCase()];
+    if (lv) r.livelloAttenzione = lv;
+    ['dataAggiornamento', 'ultimaRevisione'].forEach(k => {
+      const m = /^(\d{1,2})\/(\d{1,2})\/(\d{4})$/.exec(r[k]);
+      if (m) r[k] = m[3] + '-' + m[2].padStart(2, '0') + '-' + m[1].padStart(2, '0');
+    });
+    const v = versionFromCode(r.codice);
+    if (v) r.versione = v;
+    return r;
+  }
+  function parseRecords(text, filename) {
+    const t = text.replace(/^\ufeff/, '').trim();
+    if (!t) throw new Error('Il file è vuoto.');
+    if (/\.json$/i.test(filename || '') || t[0] === '[' || t[0] === '{') {
+      let data;
+      try { data = JSON.parse(t); } catch (_) { throw new Error('Il file JSON non è leggibile.'); }
+      const arr = Array.isArray(data) ? data : (data.prompt || data.prompts || data.items);
+      if (!Array.isArray(arr)) throw new Error('Nel file JSON non trovo l’elenco dei prompt.');
+      return arr.filter(o => o && typeof o === 'object').map(o => {
+        const r = emptyRecord();
+        Object.entries(o).forEach(([k, v]) => { const key = KEYMAP[norm(k)]; if (key) r[key] = v; });
+        return cleanRecord(r);
+      });
+    }
+    const table = parseCSV(t);
+    if (table.length < 2) throw new Error('Il file non contiene schede.');
+    const cols = table[0].map(c => KEYMAP[norm(c)] || null);
+    if (!cols.includes('codice')) throw new Error('Il file non sembra una libreria di prompt: manca la colonna «Codice».');
+    return table.slice(1).map(cells => {
+      const r = emptyRecord();
+      cols.forEach((key, i) => { if (key) r[key] = cells[i] == null ? '' : cells[i]; });
+      return cleanRecord(r);
+    }).filter(r => FIELDS.some(f => r[f.key] !== ''));
+  }
+  function addImported(records) {
+    const seen = new Set(items.map(r => r.codice.toLowerCase()));
+    let added = 0, skipped = 0;
+    records.forEach(r => {
+      const k = r.codice.toLowerCase();
+      if (k && seen.has(k)) { skipped++; return; }
+      seen.add(k); items.push(r); added++;
+    });
+    return { added, skipped };
+  }
+  function reportImport(res) {
+    const parts = [];
+    parts.push(res.added === 1 ? '1 scheda importata' : res.added + ' schede importate');
+    if (res.skipped) parts.push(res.skipped === 1 ? '1 già presente, saltata' : res.skipped + ' già presenti, saltate');
+    toast(parts.join(': ') + '.');
+    renderList();
+  }
+  $('#importBtn').addEventListener('click', () => $('#importFile').click());
+  $('#importFile').addEventListener('change', async e => {
+    const f = e.target.files[0];
+    if (!f) return;
+    try {
+      const buf = await f.arrayBuffer();
+      let text = new TextDecoder('utf-8').decode(buf);
+      if (text.includes('\ufffd')) text = new TextDecoder('windows-1252').decode(buf);
+      reportImport(addImported(parseRecords(text, f.name)));
+    } catch (err) {
+      toast(err.message || 'Non riesco a leggere il file.', 'error');
+    }
+    e.target.value = '';
+  });
+
+  /* --------------------------- Google Drive --------------------------- */
+  const DRIVE_SCOPE = 'https://www.googleapis.com/auth/drive.file';
+  let accessToken = null, tokenExpiry = 0;
+
+  class DriveError extends Error { constructor(msg, status) { super(msg); this.status = status; } }
+
+  function clientId() { return $('#clientId').value.trim(); }
+  function driveFormat() { return document.querySelector('input[name="driveFormat"]:checked').value; }
+  function driveFileName() {
+    const base = ($('#driveName').value.trim() || 'libreria_prompt').replace(/\.(csv|json)$/i, '');
+    return base + '.' + driveFormat();
+  }
+  function setDriveStatus(msg, kind, link) {
+    const el = $('#driveStatus');
+    el.textContent = msg || '';
+    el.className = 'status' + (kind ? ' ' + kind : '');
+    if (link) { el.append(' '); el.append(h('a', { href: link, target: '_blank', rel: 'noopener', text: 'Apri su Drive' })); }
+  }
+  function loadGis() {
+    return new Promise((resolve, reject) => {
+      if (window.google && google.accounts && google.accounts.oauth2) return resolve();
+      const s = h('script', { src: 'https://accounts.google.com/gsi/client', async: '' });
+      s.onload = () => resolve();
+      s.onerror = () => reject(new DriveError('Non riesco a raggiungere Google. Controlla la connessione e riprova.'));
+      document.head.append(s);
+    });
+  }
+  async function getToken() {
+    if (accessToken && Date.now() < tokenExpiry - 60000) return accessToken;
+    await loadGis();
+    return new Promise((resolve, reject) => {
+      const tc = google.accounts.oauth2.initTokenClient({
+        client_id: clientId(),
+        scope: DRIVE_SCOPE,
+        callback: r => {
+          if (r.error) return reject(new DriveError('Autorizzazione non concessa (' + r.error + ').'));
+          accessToken = r.access_token;
+          tokenExpiry = Date.now() + Number(r.expires_in || 3000) * 1000;
+          resolve(accessToken);
+        },
+        error_callback: er => {
+          const t = er && er.type;
+          reject(new DriveError(t === 'popup_closed' ? 'Autorizzazione annullata.' : t === 'popup_failed_to_open' ? 'Il browser ha bloccato la finestra di Google. Consenti i popup per questa pagina.' : 'Non è stato possibile completare l’accesso a Google.'));
+        }
+      });
+      tc.requestAccessToken();
+    });
+  }
+  async function driveFetch(url, opts) {
+    const token = await getToken();
+    const headers = Object.assign({}, (opts && opts.headers) || {}, { Authorization: 'Bearer ' + token });
+    const res = await fetch(url, Object.assign({}, opts, { headers }));
+    if (!res.ok) {
+      if (res.status === 401) { accessToken = null; }
+      throw new DriveError('Google ha risposto con un errore (' + res.status + ').', res.status);
+    }
+    return res;
+  }
+  async function findFile(name) {
+    const q = "name='" + name.replace(/\\/g, '\\\\').replace(/'/g, "\\'") + "' and trashed=false";
+    const url = 'https://www.googleapis.com/drive/v3/files?q=' + encodeURIComponent(q) +
+      '&fields=' + encodeURIComponent('files(id,name,modifiedTime,webViewLink)') +
+      '&orderBy=' + encodeURIComponent('modifiedTime desc') + '&pageSize=1';
+    const data = await (await driveFetch(url)).json();
+    return data.files && data.files[0] ? data.files[0] : null;
+  }
+  async function createFile(name, content, mime) {
+    const boundary = 'prompt-lib-' + Math.random().toString(36).slice(2);
+    const meta = JSON.stringify({ name, mimeType: mime });
+    const body = '--' + boundary + '\r\nContent-Type: application/json; charset=UTF-8\r\n\r\n' + meta +
+      '\r\n--' + boundary + '\r\nContent-Type: ' + mime + '; charset=UTF-8\r\n\r\n' + content + '\r\n--' + boundary + '--';
+    const res = await driveFetch('https://www.googleapis.com/upload/drive/v3/files?uploadType=multipart&fields=id,name,webViewLink', {
+      method: 'POST',
+      headers: { 'Content-Type': 'multipart/related; boundary=' + boundary },
+      body
+    });
+    return res.json();
+  }
+  async function updateFile(id, content, mime) {
+    const res = await driveFetch('https://www.googleapis.com/upload/drive/v3/files/' + encodeURIComponent(id) + '?uploadType=media&fields=id,name,webViewLink', {
+      method: 'PATCH',
+      headers: { 'Content-Type': mime + '; charset=UTF-8' },
+      body: content
+    });
+    return res.json();
+  }
+  function driveFailure(err) {
+    let msg = err.message || 'Operazione su Drive non riuscita.';
+    if (err.status === 401) msg = 'La sessione con Google è scaduta. Riprova.';
+    if (err.status === 403) msg = 'Google ha negato l’accesso (403). Controlla che l’API Google Drive sia attiva per il progetto dell’ente.';
+    if (err.status === 400 || err.status === 404) msg += ' Controlla il Client ID e le origini autorizzate.';
+    setDriveStatus(msg, 'err');
+  }
+  function hideConfirm() { $('#driveConfirm').hidden = true; }
+
+  async function driveSave(confirmed) {
+    if (!items.length) return;
+    const name = driveFileName();
+    const fmt = driveFormat();
+    hideConfirm();
+    setDriveStatus('Connessione a Google in corso…');
+    try {
+      await getToken();
+      setDriveStatus('Cerco «' + name + '» su Drive…');
+      const found = await findFile(name);
+      if (found && !confirmed) {
+        const when = found.modifiedTime ? new Date(found.modifiedTime).toLocaleString('it-IT') : '';
+        $('#driveConfirmText').textContent = 'Su Drive esiste già «' + name + '»' + (when ? ' (modificato il ' + when + ')' : '') +
+          '. Se lo sostituisci, il contenuto diventa quello delle ' + items.length + ' schede di questa sessione. Per tenere anche le schede già presenti, caricale prima.';
+        $('#driveConfirm').hidden = false;
+        setDriveStatus('');
+        return;
+      }
+      const content = fmt === 'csv' ? '\ufeff' + toCSV(items) : toJSONText(items);
+      const mime = fmt === 'csv' ? 'text/csv' : 'application/json';
+      setDriveStatus(found ? 'Aggiorno il file su Drive…' : 'Creo il file su Drive…');
+      const file = found ? await updateFile(found.id, content, mime) : await createFile(name, content, mime);
+      markSaved();
+      setDriveStatus((found ? 'File aggiornato: ' : 'File creato: ') + file.name + '.', 'good', file.webViewLink);
+      toast((found ? 'File aggiornato su Drive: ' : 'File creato su Drive: ') + file.name);
+    } catch (err) { driveFailure(err); }
+  }
+  async function driveLoad() {
+    const name = driveFileName();
+    hideConfirm();
+    setDriveStatus('Connessione a Google in corso…');
+    try {
+      await getToken();
+      const found = await findFile(name);
+      if (!found) {
+        setDriveStatus('Non trovo «' + name + '» su Drive. Questa pagina vede solo i file che ha creato lei.', 'err');
+        return;
+      }
+      const res = await driveFetch('https://www.googleapis.com/drive/v3/files/' + encodeURIComponent(found.id) + '?alt=media');
+      const text = await res.text();
+      const out = addImported(parseRecords(text, name));
+      reportImport(out);
+      setDriveStatus('Caricato da Drive: ' + name + '.', 'good', found.webViewLink);
+    } catch (err) { driveFailure(err); }
+  }
+  $('#driveSave').addEventListener('click', () => driveSave(false));
+  $('#driveReplace').addEventListener('click', () => driveSave(true));
+  $('#driveLoadFirst').addEventListener('click', driveLoad);
+  $('#driveCancel').addEventListener('click', () => { hideConfirm(); setDriveStatus(''); });
+  $('#driveLoad').addEventListener('click', driveLoad);
+
+  function updateButtons() {
+    const none = items.length === 0;
+    ['dlCsv', 'dlJson', 'cpCsv', 'cpJson'].forEach(id => { $('#' + id).disabled = none; });
+    const hasId = clientId() !== '';
+    $('#driveSave').disabled = none || !hasId;
+    $('#driveLoad').disabled = !hasId;
+    $('#driveHint').textContent = hasId
+      ? 'Attenzione: salvando su Drive i dati della libreria vengono trasferiti a Google. Se il file esiste già, lo aggiorna dopo la tua conferma.'
+      : 'Funzione non attiva: serve il Client ID Google dell’ente (impostazioni qui sotto). Una volta attivata, salvare o caricare trasferisce i dati della libreria da e verso Google.';
+  }
+  $('#clientId').addEventListener('input', updateButtons);
+  document.querySelectorAll('input[name="driveFormat"], #driveName').forEach(el => el.addEventListener('input', hideConfirm));
+
+  /* --------------------------- avvio --------------------------- */
+  window.addEventListener('beforeunload', e => {
+    if (dirty && items.length) { e.preventDefault(); e.returnValue = ''; }
+  });
+  ['fSearch', 'fStato', 'fLivello', 'fSort'].forEach(id => $('#' + id).addEventListener('input', renderList));
+  $('#resetFilters').addEventListener('click', () => {
+    $('#fSearch').value = ''; $('#fStato').value = ''; $('#fLivello').value = '';
+    renderList();
+  });
+  $('#incompleteMsg').textContent = INCOMPLETE_MSG;
+  $('#clientId').value = GOOGLE_CLIENT_ID;
+  resetForm(false);
+  renderList();
+})();
+</script>
+</body>
+</html>
