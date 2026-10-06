@@ -2,9 +2,9 @@
 
 Pagina web autonoma (`libreria-prompt-pa.html`) per compilare, organizzare e salvare le schede di una libreria di prompt. Si apre in un browser; non richiede installazione.
 
-## Natura e limiti dell’artefatto
+## Natura e limiti della soluzione
 
-Questo artefatto è una **demo didattica**. Aiuta a organizzare, riutilizzare e controllare i prompt, ma:
+Questa proposta di soluzione è una **demo didattica**. Aiuta a organizzare, riutilizzare e controllare i prompt, ma:
 
 - **non certifica la conformità normativa** né la sicurezza di uno strumento o di un prompt;
 - **non autorizza strumenti di IA**: il campo «Strumento autorizzato» registra un’informazione inserita da chi compila la scheda, non un’autorizzazione;
