@@ -1,6 +1,6 @@
 # Libreria dei prompt per la PA (demo didattica)
 
-Pagina web autonoma (`libreria-prompt-pa.html`) per compilare, organizzare e salvare le schede di una libreria di prompt. Si apre in un browser; non richiede installazione.
+Pagina web autonoma per compilare, organizzare e salvare le schede di una libreria di prompt. Si apre in un browser; non richiede installazione.
 
 ## Natura e limiti della soluzione
 
