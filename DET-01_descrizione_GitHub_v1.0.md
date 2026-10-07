@@ -1,3 +1,5 @@
+<img width="1536" height="1024" alt="Designer 16 05 12" src="https://github.com/user-attachments/assets/f203bca6-ab89-43f3-900a-26d287c054fe" />
+
 # DET-01 — Bozza di determina
 
 ## Descrizione
