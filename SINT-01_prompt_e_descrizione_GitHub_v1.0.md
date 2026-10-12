@@ -1,12 +1,12 @@
 # SINT-01 — Sintesi di circolari, leggi e atti
 
 ## Descrizione
-Template didattico di prompt per predisporre una **sintesi di circolare** usando Google Notebook / NotebookLM con un insieme selezionato di fonti dell’Ente. Il modello può ordinare e redigere una prima bozza; non sostituisce l’istruttoria, la valutazione tecnico-amministrativa, la decisione o la validazione della persona competente.
+Template didattico per ricavare una sintesi operativa di una circolare, una legge o un altro atto, usando Google Notebook / NotebookLM e il solo documento selezionato come fonte. La sintesi aiuta a individuare contenuti, obblighi, soggetti, scadenze e possibili ricadute per l’ufficio. Non sostituisce la lettura e la verifica del documento originale, né l’interpretazione o la valutazione di competenza dell’Ente.
 
 ## Classificazione
 - **Codice:** SINT-01
-- **Titolo:** Sintesi di circolare
-- **Categoria:** Redazione di atti — bozza
+- **Titolo:** Sintesi di circolari, leggi e atti
+- **Categoria:** Analisi e sintesi documentale
 - **Strumento previsto:** Google Notebook / NotebookLM, nell’ambiente autorizzato dall’Ente
 - **Livello di attenzione:** Medio
 - **Stato:** Bozza didattica
@@ -14,43 +14,42 @@ Template didattico di prompt per predisporre una **sintesi di circolare** usando
 - **Owner:** [ufficio]
 
 ## Scopo
-Predisporre una prima bozza di determina conforme al format dell’Ente, basata esclusivamente su istruttoria, riferimenti normativi già verificati e fonti autorizzate.
+Predisporre una sintesi breve e operativa del documento selezionato, basata esclusivamente sui suoi contenuti. La sintesi deve aiutare il destinatario a orientarsi tra oggetto, ambito, obblighi, soggetti coinvolti, scadenze, possibili impatti per l’ufficio ed eventuali punti da verificare.
 
 ## Input richiesti
 - [UFFICIO]
 - [ENTE]
-- [OGGETTO]
-- [RESPONSABILE/DESTINATARIO]
-- [SCOPO DEL PROCEDIMENTO]
-- Istruttoria o sintesi dei fatti
-- Riferimenti normativi già verificati dall’ufficio
-- Format ufficiale della determina
-- Eventuali documenti ulteriori autorizzati
+- [TIPO DOCUMENTO]
+- [NUMERO/IDENTIFICATIVO]
+- [TEMA]
+- [DESTINATARIO]
+- [SCOPO OPERATIVO]
+- Documento originale da sintetizzare, completo e pertinente
 
 ## Fonti ammesse
-Solo le fonti selezionate nell’area Fonti del notebook, complete, aggiornate, pertinenti e autorizzate dall’ufficio.
+Esclusivamente il documento originale selezionato nell’area Fonti del notebook. Non utilizzare altre fonti del notebook, fonti web o contenuti suggeriti dallo strumento.
 
 ## Output atteso
-Una bozza con premesse, motivazione e dispositivo, corredata dai riferimenti alle fonti utilizzate e da un elenco finale degli elementi da verificare o completare.
+Una sintesi operativa di massimo una pagina, in tono amministrativo e con frasi brevi, che riporti gli elementi richiesti dal prompt. Le informazioni devono essere riconducibili al documento originale tramite citazioni o riferimenti ad articoli e paragrafi, quando disponibili. I contenuti assenti o incerti devono essere segnalati, senza completarli per deduzione.
 
 ## Controlli richiesti
-- Riscontro tra fatti riportati nella bozza e istruttoria.
-- Verifica di norme, articoli e commi sulle fonti ufficiali.
-- Verifica di date, importi, termini e soggetti.
-- Controllo della specificità della motivazione rispetto al caso concreto.
-- Controllo di tono e format dell’Ente.
-- Revisione e validazione secondo ruoli e procedimento applicabile.
+- Verificare la sintesi confrontandola con il documento originale.
+- Controllare che obblighi, soggetti e scadenze siano riportati correttamente e nel relativo contesto.
+- Verificare citazioni, articoli e paragrafi indicati.
+- Distinguere ciò che è esplicitamente presente nella fonte da ciò che richiede interpretazione o approfondimento.
+- Approfondire eventuali rinvii, eccezioni o passaggi ambigui direttamente sulla fonte e, se necessario, con gli uffici competenti.
 
 ## Limiti d’uso
-- Non utilizzare fonti web, suggerite o non autorizzate.
-- Non usare l’output come atto pronto per firma, adozione o trasmissione.
-- Non delegare al modello giudizi tecnici, amministrativi o discrezionali.
+- Non considerare la sintesi sostitutiva del documento originale.
+- Non usare la sintesi come interpretazione giuridica o come indicazione definitiva di adempimenti senza le verifiche previste dall’Ente.
+- Non aggiungere informazioni, obblighi o scadenze non presenti nel documento.
+- Non utilizzare fonti web, altre fonti del notebook o contenuti non autorizzati.
 - Non includere dati personali non necessari.
 
 ## Convenzione di denominazione
 `SINT-01_v1.0_YYYY-MM`
 
-Esempio di file di lavoro: `oggetto_BOZZA_v0.1`, da adeguare alla convenzione documentale dell’Ente.
+Esempio di file di lavoro: `tema_SINTESI_v0.1`, da adeguare alla convenzione documentale dell’Ente.
 
 ## Prompt
 
